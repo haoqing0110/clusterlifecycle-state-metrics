@@ -57,11 +57,12 @@ var (
 		Resource: "clusterversions",
 	}
 
-	mciGVR = schema.GroupVersionResource{
-		Group:    "internal.open-cluster-management.io",
-		Version:  "v1beta1",
-		Resource: "managedclusterinfos",
-	}
+	/*	mciGVR = schema.GroupVersionResource{
+			Group:    "internal.open-cluster-management.io",
+			Version:  "v1beta1",
+			Resource: "managedclusterinfos",
+		}
+	*/
 
 	mcGVR = schema.GroupVersionResource{
 		Group:    "cluster.open-cluster-management.io",
@@ -78,25 +79,25 @@ func getManagedClusterInfoMetricFamilies(hubClusterID string, client dynamic.Int
 			Help: descClusterInfoHelp,
 			GenerateFunc: wrapManagedClusterInfoFunc(func(obj *unstructured.Unstructured) metric.Family {
 				klog.Infof("Wrap %s", obj.GetName())
-				mciU, errMCI := client.Resource(mciGVR).Namespace(obj.GetName()).Get(context.TODO(), obj.GetName(), metav1.GetOptions{})
-				if errMCI != nil {
-					klog.Errorf("Error: %v", errMCI)
-					return metric.Family{Metrics: []*metric.Metric{}}
-				}
-				mci := &mciv1beta1.ManagedClusterInfo{}
-				err := runtime.DefaultUnstructuredConverter.FromUnstructured(mciU.UnstructuredContent(), &mci)
-				if err != nil {
-					klog.Errorf("Error: %v", err)
-					return metric.Family{Metrics: []*metric.Metric{}}
-				}
-				mcU, errMC := client.Resource(mcGVR).Get(context.TODO(), mci.GetName(), metav1.GetOptions{})
+				//				mciU, errMCI := client.Resource(mciGVR).Namespace(obj.GetName()).Get(context.TODO(), obj.GetName(), metav1.GetOptions{})
+				//				if errMCI != nil {
+				//					klog.Errorf("Error: %v", errMCI)
+				//					return metric.Family{Metrics: []*metric.Metric{}}
+				//				}
+				//				mci := &mciv1beta1.ManagedClusterInfo{}
+				//				err := runtime.DefaultUnstructuredConverter.FromUnstructured(mciU.UnstructuredContent(), &mci)
+				//				if err != nil {
+				//					klog.Errorf("Error: %v", err)
+				//					return metric.Family{Metrics: []*metric.Metric{}}
+				//				}
+				mcU, errMC := client.Resource(mcGVR).Get(context.TODO(), obj.GetName(), metav1.GetOptions{})
 				if errMC != nil {
 					klog.Errorf("Error: %v", errMC)
 					return metric.Family{Metrics: []*metric.Metric{}}
 				}
 				klog.Infof("mcU: %v", mcU)
 				mc := &mcv1.ManagedCluster{}
-				err = runtime.DefaultUnstructuredConverter.FromUnstructured(mcU.UnstructuredContent(), &mc)
+				err := runtime.DefaultUnstructuredConverter.FromUnstructured(mcU.UnstructuredContent(), &mc)
 				if err != nil {
 					klog.Errorf("Error: %v", err)
 					return metric.Family{Metrics: []*metric.Metric{}}
@@ -104,53 +105,51 @@ func getManagedClusterInfoMetricFamilies(hubClusterID string, client dynamic.Int
 				available := getAvailableStatus(mc)
 				// klog.Infof("mc: %v", mc)
 				createdVia := getCreatedVia(mc)
-				clusterID := mci.Status.ClusterID
+				clusterID := "TODO"
 				//Cluster ID is not available on non-OCP thus use the name
-				if clusterID == "" &&
-					mci.Status.KubeVendor != mciv1beta1.KubeVendorOpenShift {
-					clusterID = mci.GetName()
-				}
+				//				if clusterID == "" &&
+				//					mci.Status.KubeVendor != mciv1beta1.KubeVendorOpenShift {
+				//					clusterID = mci.GetName()
+				//				}
 
 				//ClusterID is not available on OCP 3.x thus use the name
-				if clusterID == "" &&
-					mci.Status.KubeVendor == mciv1beta1.KubeVendorOpenShift && mci.Status.DistributionInfo.OCP.Version == "3" {
-					clusterID = mci.GetName()
-				}
+				//				if clusterID == "" &&
+				//					mci.Status.KubeVendor == mciv1beta1.KubeVendorOpenShift && mci.Status.DistributionInfo.OCP.Version == "3" {
+				//					clusterID = mci.GetName()
+				//				}
 
-				version := getVersion(mci)
+				version := "TODO"
 				core_worker, socket_worker := getCapacity(mc)
 
-				nodeListLength := len(mci.Status.NodeList)
+				//				nodeListLength := len(mci.Status.NodeList)
 
 				if clusterID == "" ||
-					mci.Status.KubeVendor == "" ||
-					mci.Status.CloudVendor == "" ||
+					//					mci.Status.KubeVendor == "" ||
+					//				mci.Status.CloudVendor == "" ||
 					version == "" ||
-					nodeListLength == 0 ||
-					((core_worker == 0 || socket_worker == 0) && hasWorker(mci)) {
-					klog.Infof("Not enough information available for %s", mci.GetName())
+					//					nodeListLength == 0 ||
+					//					((core_worker == 0 || socket_worker == 0) && hasWorker(mci)) {
+					(core_worker == 0 || socket_worker == 0) {
+					klog.Infof("Not enough information available for %s", obj.GetName())
 					klog.Infof(`\tClusterID=%s,
-KubeVendor=%s,
-CloudVendor=%s,
 Version=%s,
 available=%s,
-NodeList length=%d,
 core_worker=%d,
 socket_worker=%d`,
 						clusterID,
-						mci.Status.KubeVendor,
-						mci.Status.CloudVendor,
+//						mci.Status.KubeVendor,
+//						mci.Status.CloudVendor,
 						version,
 						available,
-						nodeListLength,
+//						nodeListLength,
 						core_worker,
 						socket_worker)
 					return metric.Family{Metrics: []*metric.Metric{}}
 				}
 				labelsValues := []string{hubClusterID,
 					clusterID,
-					string(mci.Status.KubeVendor),
-					string(mci.Status.CloudVendor),
+					"TODO",
+					"TODO",
 					version,
 					available,
 					createdVia,

@@ -4,10 +4,7 @@
 package collectors
 
 import (
-	"golang.org/x/net/context"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/meta"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
 	"k8s.io/client-go/tools/cache"
@@ -17,7 +14,7 @@ import (
 )
 
 // Create ManagedClusterInfo informer, watch and update metrics
-func createManagedClusterInfoInformer(apiserver string, kubeconfig string, ns string, store *metricsstore.MetricsStore) {
+/* func createManagedClusterInfoInformer(apiserver string, kubeconfig string, ns string, store *metricsstore.MetricsStore) {
 	config, err := clientcmd.BuildConfigFromFlags(apiserver, kubeconfig)
 	if err != nil {
 		klog.Fatalf("cannot create Dynamic client: %v", err)
@@ -29,7 +26,7 @@ func createManagedClusterInfoInformer(apiserver string, kubeconfig string, ns st
 
 	stopCh := make(chan struct{})
 	go startWatchingManagedClusterInfo(stopCh, client, informer.Informer(), store)
-}
+}*/
 
 // Create ManagedCluster informer, watch and update metrics
 func createManagedClusterInformer(apiserver string, kubeconfig string, store *metricsstore.MetricsStore) {
@@ -46,7 +43,7 @@ func createManagedClusterInformer(apiserver string, kubeconfig string, store *me
 	go startWatchingManagedCluster(stopCh, informer.Informer(), store)
 }
 
-func startWatchingManagedClusterInfo(stopCh <-chan struct{}, client dynamic.Interface, s cache.SharedIndexInformer, store *metricsstore.MetricsStore) {
+/* func startWatchingManagedClusterInfo(stopCh <-chan struct{}, client dynamic.Interface, s cache.SharedIndexInformer, store *metricsstore.MetricsStore) {
 	handlers := cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			objMC := findManagedCluster(obj, client)
@@ -63,7 +60,7 @@ func startWatchingManagedClusterInfo(stopCh <-chan struct{}, client dynamic.Inte
 	}
 	s.AddEventHandler(handlers)
 	s.Run(stopCh)
-}
+} */
 
 func startWatchingManagedCluster(stopCh <-chan struct{}, s cache.SharedIndexInformer, store *metricsstore.MetricsStore) {
 	handlers := cache.ResourceEventHandlerFuncs{
@@ -81,6 +78,7 @@ func startWatchingManagedCluster(stopCh <-chan struct{}, s cache.SharedIndexInfo
 	s.Run(stopCh)
 }
 
+/*
 func findManagedCluster(obj interface{}, client dynamic.Interface) interface{} {
 	o, err := meta.Accessor(obj)
 	if err != nil {
@@ -96,3 +94,4 @@ func findManagedCluster(obj interface{}, client dynamic.Interface) interface{} {
 
 	return mc
 }
+*/

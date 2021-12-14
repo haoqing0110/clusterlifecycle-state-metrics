@@ -130,9 +130,10 @@ func (b *Builder) buildManagedClusterInfoCollectorWithClient(client dynamic.Inte
 		composedMetricGenFuncs,
 	)
 
-	for _, ns := range b.namespaces {
-		createManagedClusterInfoInformer(b.apiserver, b.kubeconfig, ns, store)
-	}
+	/*	for _, ns := range b.namespaces {
+			createManagedClusterInfoInformer(b.apiserver, b.kubeconfig, ns, store)
+		}
+	*/
 	createManagedClusterInformer(b.apiserver, b.kubeconfig, store)
 
 	return store
